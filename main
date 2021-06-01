@@ -1,0 +1,87 @@
+import PySimpleGUIQt as sg
+import os.path
+
+
+
+
+
+
+
+
+layout=[
+        [sg.Image('icon.png')],
+        [sg.Text("Student Name: "), sg.Input(key='-STUDENTNAME-')],
+        [sg.Text("Student Number"), sg.Input(key='-STUDENTNUMBER-')],
+        [sg.Button('Submit')]]
+
+menulayout=[
+        [sg.Image('icon.png')],
+        [sg.Text(text='Welcome'), sg.Text(key='-MSG-')],
+        [sg.Button('Classification'), sg.Button('Detection')]
+]
+
+file_list_column=[
+    [
+        sg.Text("Image Folder"),
+        sg.In(size=(25,1), enable_events=True, key="-FOLDER-"),
+        sg.FolderBrowse(),
+    ],
+    [
+        sg.Listbox(
+            values=[], enable_events=True, size=(40,20),
+            key='-FILE_LIST-'
+        )
+    ],
+]
+image_viewer_column=[
+    [sg.Text('Choose an image from the selected directory on the left')],
+    [sg.Text(size=(40,1), key='-TOUT-')],
+    [sg.Image(key='-IMAGE-')],
+]
+classlayout=[
+    [
+        sg.Column(file_list_column),
+        sg.VSeperator(),
+        sg.Column(image_viewer_column),
+    ]
+]
+
+window=sg.Window("Mask Master", layout)
+
+while True:
+    event, values = window.read()
+    if event == "Exit" or event == sg.WIN_CLOSED:
+        break
+    if event == 'Submit':
+        window.close()
+        window = sg.Window("Mask Master", menulayout)
+
+    if event == 'Classification':
+        window.close()
+        window = sg.Window("Mask Master", classlayout)
+        window['-MSG-'].update(values['-STUDENTNAME-'] + ', ' + values['-STUDENTNUMBER-'])
+    if event == "-FOLDER-":
+        folder = values["-FOLDER-"]
+        try:
+            file_list = os.listdir(folder)
+        except:
+            file_list = []
+        fnames = [
+            f
+            for f in file_list
+            if os.path.isfile(os.path.join(folder, f))
+
+        ]
+        window["-FILE_LIST-"].update(fnames)
+    elif event=="-FILE_LIST-":
+        try:
+            filename = os.path.join(
+                values["-FOLDER-"], values["-FILE_LIST-"] [0]
+            )
+            window["-TOUT-"].update(filename)
+            window["-IMAGE-"].update(filename=filename)
+        except:
+            pass
+
+
+window.close()
